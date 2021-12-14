@@ -44,7 +44,13 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Assets" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\mattk\PycharmProjects\Racecar\Assets" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -119,25 +125,29 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="137" y="19" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1366.728@0.0.1366.728" timestamp="1639405507843" />
-    <state width="1345" height="179" key="GridCell.Tab.0.bottom" timestamp="1639464630848">
+    <state width="1345" height="179" key="GridCell.Tab.0.bottom" timestamp="1639465318831">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="179" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1639464630848" />
-    <state width="1345" height="179" key="GridCell.Tab.0.center" timestamp="1639464630848">
+    <state width="1345" height="179" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1639465318831" />
+    <state width="1345" height="179" key="GridCell.Tab.0.center" timestamp="1639465318830">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="179" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1639464630848" />
-    <state width="1345" height="179" key="GridCell.Tab.0.left" timestamp="1639464630848">
+    <state width="1345" height="179" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1639465318830" />
+    <state width="1345" height="179" key="GridCell.Tab.0.left" timestamp="1639465318830">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="179" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1639464630848" />
-    <state width="1345" height="179" key="GridCell.Tab.0.right" timestamp="1639464630848">
+    <state width="1345" height="179" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1639465318830" />
+    <state width="1345" height="179" key="GridCell.Tab.0.right" timestamp="1639465318830">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="179" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1639464630848" />
+    <state width="1345" height="179" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1639465318830" />
     <state x="184" y="9" key="SettingsEditor" timestamp="1639405544584">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="184" y="9" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1639405544584" />
+    <state x="346" y="49" width="672" height="678" key="search.everywhere.popup" timestamp="1639465256790">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="346" y="49" width="672" height="678" key="search.everywhere.popup/0.0.1366.728@0.0.1366.728" timestamp="1639465256790" />
   </component>
 </project>

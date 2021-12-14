@@ -8,6 +8,13 @@ def main():
     # Sets the screen dimensions.
     size = 800, 600
 
+    # Import window icon.
+    icon = pygame.image.load("Assets/Flag.png")
+
+    # Setting the window title and logo.
+    pygame.display.set_caption("Racecar")
+    pygame.display.set_icon(icon)
+
     # Create game window.
     screen = pygame.display.set_mode(size)
 
@@ -26,6 +33,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+        # Update screen.
+        pygame.display.flip()
 
 
 if __name__ == "__main__":
