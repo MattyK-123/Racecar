@@ -15,9 +15,9 @@ class Racecar:
         self.steering = 5
 
         # Racecar coordinates and rotation angle
-        self.x = 0
-        self.y = 0
-        self.a = 0
+        self.x = 150
+        self.y = 150
+        self.a = 38
 
         # Racecar physics variables
         self.vel = 0
@@ -26,8 +26,9 @@ class Racecar:
         # Sets acceleration constants
         self.ACC = 500
         self.DEC = -500
-        self.BRAKE = 300
+        self.BRAKE = 400
         self.FRICTION = 100
+        self.STEER = 200
 
         # Sets the limits for the vehicle
         self.VEL_LIM = 500
@@ -39,8 +40,9 @@ class Racecar:
                                           (self.car.get_width() * scale, self.car.get_height() * scale))
 
     def draw(self):
-        rotated_image = pygame.transform.rotate(self.car, self.a)
-        self.screen.blit(rotated_image, (self.x, self.y))
+        rotated_image = pygame.transform.rotate(self.car, -1 * self.a)
+        self.screen.blit(rotated_image,
+                         (self.x - int(rotated_image.get_width() / 2), self.y - int(rotated_image.get_height() / 2)))
 
     def update(self, dt):
         # Get state of all keys
@@ -51,9 +53,9 @@ class Racecar:
             # Sets the acceleration to the constant when the player is driving
             self.acc = self.ACC
         # If the S key is pressed decelerate
-        elif keys[pygame.K_s]:
-            # Sets the acceleration to the constant for when the player is reversing
-            self.acc = self.DEC
+        # elif keys[pygame.K_s]:
+        #     # Sets the acceleration to the constant for when the player is reversing
+        #     self.acc = self.DEC
         else:
             # Sets the acceleration to 0 if nothing is being pressed
             self.acc = 0
@@ -66,10 +68,10 @@ class Racecar:
             if self.vel < 0:
                 self.vel = 0
 
-        if keys[pygame.K_a]:
-            self.a += 50 * dt
-        if keys[pygame.K_d]:
-            self.a -= 50 * dt
+        if keys[pygame.K_a] and self.vel > 0:
+            self.a -= self.STEER * dt
+        if keys[pygame.K_d] and self.vel > 0:
+            self.a += self.STEER * dt
 
         # Calculate the change in distance based on the velocity
         delta = self.vel * dt + 0.5 * self.acc * (dt ** 2)
@@ -87,9 +89,5 @@ class Racecar:
         self.x += delta * math.cos(math.radians(self.a))
         self.y += delta * math.sin(math.radians(self.a))
 
-
-def rotate(img, pos, angle):
-    w, h = img.get_size()
-    img2 = pygame.Surface((w * 2, h * 2), pygame.SRCALPHA)
-    img2.blit(img, (w - pos[0], h - pos[1]))
-    return pygame.transform.rotate(img2, angle)
+        # Draw the vehicles changes to the screen
+        self.draw()

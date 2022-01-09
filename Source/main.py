@@ -44,7 +44,6 @@ def main():
 
         if state == "PLAY":
             car.update(dt)
-            car.draw()
         elif state == "QUIT":
             pygame.quit()
             exit()
