@@ -3,7 +3,6 @@ import pygame
 
 # Local imports
 import Barrier
-import Colours
 import Racecar
 import Text
 
@@ -33,14 +32,18 @@ def main():
     # Variable used to store the game state
     state = "INIT"
 
-    # Instantiate Barrier object
+    # Instantiate Barrier object list
     barrierList = []
+
+    # Instantiate Goal object list
+    goalList = []
 
     # Declare Racecar object
     car = None
 
-    startPoint = (0, 0)
-    endPoint = (0, 0)
+    # TODO: Keep for adding new goals and barriers
+    # startPoint = (0, 0)
+    # endPoint = (0, 0)
 
     # Start the main gameplay loop
     while True:
@@ -69,12 +72,16 @@ def main():
                 barrier.update()
 
         elif state == "QUIT":
-
-            file = open("../Data/Barriers.txt", "a")
-
-            for barrier in barrierList:
-                file.write(str(barrier.start[0]) + "," + str(barrier.start[1]) + "," + str(barrier.end[0]) + "," + str(
-                    barrier.end[1]) + "\n")
+            # TODO: Keep for saving barriers to text file
+            # # Clear barriers text file
+            # open("../Data/Barriers.txt", "w").close()
+            # # Save the barriers on screen to the text file
+            # file = open("../Data/Barriers.txt", "a")
+            # for barrier in barrierList:
+            #     file.write(str(barrier.start[0]) + "," + str(barrier.start[1]) + "," + str(barrier.end[0]) + "," + str(
+            #         barrier.end[1]) + "\n")
+            # # Close the file and quit
+            # file.close()
 
             pygame.quit()
             exit()
@@ -84,23 +91,24 @@ def main():
             if event.type == pygame.QUIT:
                 state = "QUIT"
 
-        # Allows the creation of barriers using the mouse
-        keys = pygame.key.get_pressed()
-
-        if keys[pygame.K_s] and startPoint == (0, 0):
-            startPoint = pygame.mouse.get_pos()
-
-        elif keys[pygame.K_e] and endPoint == (0, 0) and not startPoint == (0, 0):
-            endPoint = pygame.mouse.get_pos()
-            barrierList.append(Barrier.Barrier(screen, startPoint, endPoint))
-            startPoint = (0, 0)
-            endPoint = (0, 0)
-
-        if not startPoint == (0, 0):
-            pygame.draw.line(screen, Colours.BLACK, startPoint, pygame.mouse.get_pos(), 3)
+        # TODO: Keep for adding new goals and barriers
+        # # Allows the creation of barriers using the mouse
+        # keys = pygame.key.get_pressed()
+        #
+        # if keys[pygame.K_s] and startPoint == (0, 0):
+        #     startPoint = pygame.mouse.get_pos()
+        #
+        # elif keys[pygame.K_e] and endPoint == (0, 0) and not startPoint == (0, 0):
+        #     endPoint = pygame.mouse.get_pos()
+        #     barrierList.append(Barrier.Barrier(screen, startPoint, endPoint))
+        #     startPoint = (0, 0)
+        #     endPoint = (0, 0)
+        #
+        # if not startPoint == (0, 0):
+        #     pygame.draw.line(screen, Colours.BLACK, startPoint, pygame.mouse.get_pos(), 3)
 
         # Display the fps in the top left corner
-        Text.renderText(screen, "FPS: " + str(round(clock.get_fps(), 5)), (5, 20))
+        Text.renderText(screen, "FPS: " + str(round(clock.get_fps(), 5)), (105, 5))
 
         # Display the current game state
         Text.renderText(screen, "STATE: " + state, (5, 5))

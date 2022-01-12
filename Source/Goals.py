@@ -5,7 +5,7 @@ import pygame
 import Colours
 
 
-class Barrier:
+class Goal:
     # Constant that tells the barrier to be drawn to screen
     DEBUG = False
 
@@ -22,17 +22,17 @@ class Barrier:
 
     def draw(self):
         # Draws the barrier to the screen if debug mode is enabled
-        if Barrier.DEBUG and not self.COLLISION:
+        if Goal.DEBUG and not self.COLLISION:
             pygame.draw.line(self.screen, Colours.BLACK, self.start, self.end, 3)
-        elif Barrier.DEBUG and self.COLLISION:
+        elif Goal.DEBUG and self.COLLISION:
             pygame.draw.line(self.screen, Colours.RED, self.start, self.end, 3)
 
     def update(self):
         self.draw()
 
 
-def loadBarriers(screen):
-    loadedBarriers = []
+def loadGoals(screen):
+    loadedGoals = []
 
     file = open("../Data/Barriers.txt", "r+")
 
@@ -43,8 +43,8 @@ def loadBarriers(screen):
 
         p1 = (float(split[0]), float(split[1]))
         p2 = (float(split[2]), float(split[3]))
-        loadedBarriers.append(Barrier(screen, p1, p2))
+        loadedGoals.append(Goal(screen, p1, p2))
 
     file.close()
 
-    return loadedBarriers
+    return loadedGoals

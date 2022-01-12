@@ -58,6 +58,17 @@ class Racecar:
                                         (self.x - int(rotated_image.get_width() / 2),
                                          self.y - int(rotated_image.get_height() / 2)))
 
+    # Resets the cars parameters and returns it to its original position
+    def reset(self):
+        # Racecar coordinates and rotation angle
+        self.x = 150
+        self.y = 150
+        self.a = 38
+
+        # Racecar physics variables
+        self.vel = 0
+        self.acc = 0
+
     # Return true if line segments AB and CD intersect
     def intersect(self):
 
@@ -72,7 +83,7 @@ class Racecar:
             D = barrier.end
             if ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D):
                 barrier.COLLISION = True
-                # return True
+                self.reset()
             else:
                 barrier.COLLISION = False
         return False
