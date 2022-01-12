@@ -33,3 +33,22 @@ class Barrier:
 
     def update(self):
         self.draw()
+
+
+def loadBarriers(screen):
+    loadedBarriers = []
+
+    file = open("../Data/Barriers.txt", "r+")
+
+    lines = file.readlines()
+
+    for line in lines:
+        split = line.split(",")
+
+        p1 = (float(split[0]), float(split[1]))
+        p2 = (float(split[2]), float(split[3]))
+        loadedBarriers.append(Barrier(screen, p1, p2))
+
+    file.close()
+
+    return loadedBarriers

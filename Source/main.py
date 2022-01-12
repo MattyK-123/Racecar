@@ -1,10 +1,11 @@
 # External imports
 import pygame
 
-import Barrier
 # Local imports
-import FPS
+import Barrier
+import Colours
 import Racecar
+import Text
 
 
 def main():
@@ -26,17 +27,17 @@ def main():
     # Create game window
     screen = pygame.display.set_mode(size)
 
-    # Create new pygame clock object to maintain constant frame-rate (100 FPS).
+    # Create new pygame clock object to maintain constant frame-rate (100 FPS)
     clock = pygame.time.Clock()
 
     # Variable used to store the game state
     state = "INIT"
 
-    # Instantiate Barrier object.
+    # Instantiate Barrier object
     barrierList = []
 
-    # Instantiate Racecar object.
-    car = Racecar.Racecar(screen, barrierList)
+    # Declare Racecar object
+    car = None
 
     startPoint = (0, 0)
     endPoint = (0, 0)
@@ -53,8 +54,14 @@ def main():
             # Change state to PLAY state.
             state = "PLAY"
 
+            # Import the barriers from the barrier file
+            barrierList = Barrier.loadBarriers(screen)
+
+            # Initialize Racecar object.
+            car = Racecar.Racecar(screen, barrierList)
+
         elif state == "PLAY":
-            # Call vehicles update method.
+            # Call vehicles update method
             car.update(dt)
 
             # Update barriers
@@ -62,14 +69,22 @@ def main():
                 barrier.update()
 
         elif state == "QUIT":
+
+            file = open("../Data/Barriers.txt", "a")
+
+            for barrier in barrierList:
+                file.write(str(barrier.start[0]) + "," + str(barrier.start[1]) + "," + str(barrier.end[0]) + "," + str(
+                    barrier.end[1]) + "\n")
+
             pygame.quit()
             exit()
 
-        # Transition the state to the QUIT state if the close button is clicked.
+        # Transition the state to the QUIT state if the close button is clicked
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 state = "QUIT"
 
+        # Allows the creation of barriers using the mouse
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_s] and startPoint == (0, 0):
@@ -81,8 +96,14 @@ def main():
             startPoint = (0, 0)
             endPoint = (0, 0)
 
-        # Display the fps in the top left corner.
-        FPS.display(screen, clock)
+        if not startPoint == (0, 0):
+            pygame.draw.line(screen, Colours.BLACK, startPoint, pygame.mouse.get_pos(), 3)
+
+        # Display the fps in the top left corner
+        Text.renderText(screen, "FPS: " + str(round(clock.get_fps(), 5)), (5, 20))
+
+        # Display the current game state
+        Text.renderText(screen, "STATE: " + state, (5, 5))
 
         # Update screen
         pygame.display.update()

@@ -72,7 +72,7 @@ class Racecar:
             D = barrier.end
             if ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D):
                 barrier.COLLISION = True
-                return True
+                # return True
             else:
                 barrier.COLLISION = False
         return False
