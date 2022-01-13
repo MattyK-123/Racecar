@@ -7,7 +7,7 @@ import Colours
 
 class Goal:
     # Constant that tells the barrier to be drawn to screen
-    DEBUG = False
+    DEBUG = True
 
     def __init__(self, screen, start, end):
         # Get reference to the game screen
@@ -17,14 +17,14 @@ class Goal:
         self.start = start
         self.end = end
 
-        # Is used to change the color of the line if the barrier is being collided with.
-        self.COLLISION = False
+        # Property that tells the player if the goal is the next active goal.
+        self.active = False
 
     def draw(self):
         # Draws the barrier to the screen if debug mode is enabled
-        if Goal.DEBUG and not self.COLLISION:
-            pygame.draw.line(self.screen, Colours.BLACK, self.start, self.end, 3)
-        elif Goal.DEBUG and self.COLLISION:
+        if Goal.DEBUG and self.active:
+            pygame.draw.line(self.screen, Colours.GREEN, self.start, self.end, 3)
+        elif Goal.DEBUG and not self.active:
             pygame.draw.line(self.screen, Colours.RED, self.start, self.end, 3)
 
     def update(self):
@@ -34,7 +34,7 @@ class Goal:
 def loadGoals(screen):
     loadedGoals = []
 
-    file = open("../Data/Barriers.txt", "r+")
+    file = open("../Data/Goals.txt", "r+")
 
     lines = file.readlines()
 

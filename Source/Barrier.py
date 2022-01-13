@@ -7,7 +7,7 @@ import Colours
 
 class Barrier:
     # Constant that tells the barrier to be drawn to screen
-    DEBUG = False
+    DEBUG = True
 
     def __init__(self, screen, start, end):
         # Get reference to the game screen

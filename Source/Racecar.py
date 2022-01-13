@@ -11,20 +11,25 @@ class Racecar:
     # Constant that tells the car to draw debug lines.
     DEBUG = True
 
-    def __init__(self, screen, barrierList):
-
+    def __init__(self, screen, barrierList, goalList):
         # Get reference to the game screen
         self.screen = screen
 
         # Get reference to list of barriers
-        self.barrierList = barrierList
+        self.barrierList = barrierList.copy()
+
+        # Get reference to list of goals
+        self.goalList = goalList.copy()
+
+        # Keep track of the vehicles score.
+        self.score = 0
 
         # Set the steering sensitivity
         self.steering = 5
 
         # Racecar coordinates and rotation angle
-        self.x = 150
-        self.y = 150
+        self.x = 240
+        self.y = 210
         self.a = 38
 
         # Sets car's collision line points.
@@ -61,16 +66,19 @@ class Racecar:
     # Resets the cars parameters and returns it to its original position
     def reset(self):
         # Racecar coordinates and rotation angle
-        self.x = 150
-        self.y = 150
+        self.x = 240
+        self.y = 210
         self.a = 38
 
         # Racecar physics variables
         self.vel = 0
         self.acc = 0
 
-    # Return true if line segments AB and CD intersect
-    def intersect(self):
+        # Resets the score
+        self.score = 0
+
+    # Return true if the vehicles' hotbox collides with a barrier
+    def intersectBarrier(self):
 
         # Helper function defined as a lambda within the intersect method
         def ccw(A_, B_, C_):
@@ -84,9 +92,34 @@ class Racecar:
             if ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D):
                 barrier.COLLISION = True
                 self.reset()
+                return True
             else:
                 barrier.COLLISION = False
         return False
+
+    # Check if the vehicles' hotbox collides the next goal
+    def intersectGoal(self):
+
+        # Helper function defined as a lambda within the intersect method
+        def ccw(A_, B_, C_):
+            return (C_[1] - A_[1]) * (B_[0] - A_[0]) > (B_[1] - A_[1]) * (C_[0] - A_[0])
+
+        goal = self.goalList[0]
+
+        goal.active = True
+
+        A = self.front
+        B = self.back
+        C = goal.start
+        D = goal.end
+
+        if ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D):
+            self.score += 10
+            goal.active = False
+            self.goalList.append(self.goalList.pop(0))
+            return True
+        else:
+            return False
 
     def draw(self):
         # Rotate the image by the angle "a".
@@ -163,7 +196,12 @@ class Racecar:
         self.back = (self.x - 25 * math.cos(math.radians(self.a)), self.y - 25 * math.sin(math.radians(self.a)))
 
         # Check for intersections with barriers.
-        self.intersect()
+        self.intersectBarrier()
+
+        # Check for intersections with goals.
+        self.intersectGoal()
+
+        self.score += 0.001 * delta
 
         # Draw the vehicles changes to the screen
         self.draw()
