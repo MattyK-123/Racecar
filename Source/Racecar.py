@@ -1,207 +1,130 @@
-# External imports
 import math
 
 import pygame
 
-# Internal imports
-import Colours
+import Goal
+
+# Constants for car physics.
+ACC = 500
+DEC = -500
+BRAKE = 400
+FRICTION = 100
+STEER = 200
+MAX = 500
 
 
 class Racecar:
-    # Constant that tells the car to draw debug lines.
-    DEBUG = True
+    DEBUG = False
 
-    def __init__(self, screen, barrierList, goalList):
-        # Get reference to the game screen
-        self.screen = screen
-
-        # Get reference to list of barriers
-        self.barrierList = barrierList.copy()
-
-        # Get reference to list of goals
-        self.goalList = goalList.copy()
-
-        # Keep track of the vehicles score.
+    def __init__(self, goals: list):
+        # Define a variable to track this instance's score.
         self.score = 0
 
-        # Set the steering sensitivity
-        self.steering = 5
+        # Create a copy of the goal list order.
+        self.goals = goals.copy()
 
-        # Racecar coordinates and rotation angle
-        self.x = 240
-        self.y = 210
-        self.a = 38
+        # Define the car's position in the plane and the angle from the origin.
+        self.pos = (240, 210)
+        self.angle = 38
 
-        # Sets car's collision line points.
-        self.front = (self.x + 25 * math.cos(math.radians(self.a)), self.y + 25 * math.sin(math.radians(self.a)))
-        self.back = (self.x - 25 * math.cos(math.radians(self.a)), self.y - 25 * math.sin(math.radians(self.a)))
+        # Maintain the coordinates of the car's hit line.
+        self.start = (self.pos[0] + 25 * math.cos(math.radians(self.angle)),
+                      self.pos[1] + 25 * math.sin(math.radians(self.angle)))
+        self.end = (self.pos[0] - 25 * math.cos(math.radians(self.angle)),
+                    self.pos[1] - 25 * math.sin(math.radians(self.angle)))
 
-        # Racecar physics variables
-        self.vel = 0
+        # Define the car's acceleration and velocity values.
         self.acc = 0
-
-        # Sets vehicle constants
-        self.ACC = 500
-        self.DEC = -500
-        self.BRAKE = 400
-        self.FRICTION = 100
-        self.STEER = 200
-
-        # Sets the limits for the vehicle
-        self.VEL_LIM = 500
+        self.vel = 0
 
         # Import the sprites to be used for the vehicle and scale using scale factor
         scale = 0.1
-        self.carSurface = pygame.image.load("../Assets/Racecar.png")
-        self.carSurface = pygame.transform.scale(self.carSurface,
-                                                 (self.carSurface.get_width() * scale,
-                                                  self.carSurface.get_height() * scale))
+        self.car = pygame.image.load("../Assets/Racecar.png")
+        self.car = pygame.transform.scale(self.car, (self.car.get_width() * scale, self.car.get_height() * scale))
 
-        # Draw the image for the first time and store the images rectangle
-        rotated_image = pygame.transform.rotate(self.carSurface, -1 * self.a)
-        self.carRect = self.screen.blit(rotated_image,
-                                        (self.x - int(rotated_image.get_width() / 2),
-                                         self.y - int(rotated_image.get_height() / 2)))
-
-    # Resets the cars parameters and returns it to its original position
-    def reset(self):
-        # Racecar coordinates and rotation angle
-        self.x = 240
-        self.y = 210
-        self.a = 38
-
-        # Racecar physics variables
-        self.vel = 0
-        self.acc = 0
-
-        # Resets the score
-        self.score = 0
-
-    # Return true if the vehicles' hotbox collides with a barrier
-    def intersectBarrier(self):
-
-        # Helper function defined as a lambda within the intersect method
-        def ccw(A_, B_, C_):
-            return (C_[1] - A_[1]) * (B_[0] - A_[0]) > (B_[1] - A_[1]) * (C_[0] - A_[0])
-
-        for barrier in self.barrierList:
-            A = self.front
-            B = self.back
-            C = barrier.start
-            D = barrier.end
-            if ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D):
-                barrier.COLLISION = True
-                self.reset()
-                return True
-            else:
-                barrier.COLLISION = False
-        return False
-
-    # Check if the vehicles' hotbox collides the next goal
-    def intersectGoal(self):
-
-        # Helper function defined as a lambda within the intersect method
-        def ccw(A_, B_, C_):
-            return (C_[1] - A_[1]) * (B_[0] - A_[0]) > (B_[1] - A_[1]) * (C_[0] - A_[0])
-
-        goal = self.goalList[0]
-
-        goal.active = True
-
-        A = self.front
-        B = self.back
-        C = goal.start
-        D = goal.end
-
-        if ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D):
-            self.score += 10
-            goal.active = False
-            self.goalList.append(self.goalList.pop(0))
-            return True
-        else:
-            return False
-
-    def draw(self):
-        # Rotate the image by the angle "a".
-        rotated_image = pygame.transform.rotate(self.carSurface, -1 * self.a)
+    def draw(self, screen: pygame.Surface):
+        # Rotate the image by the car's angle.
+        rotated = pygame.transform.rotate(self.car, -1 * self.angle)
 
         # Draw the rotated image to the screen.
-        self.carRect = self.screen.blit(rotated_image,
-                                        (self.x - int(rotated_image.get_width() / 2),
-                                         self.y - int(rotated_image.get_height() / 2)))
+        screen.blit(rotated, (self.pos[0] - int(rotated.get_width() / 2), self.pos[1] - int(rotated.get_height() / 2)))
 
-        # If debug is enabled, draw the car's collision line.
-        if Racecar.DEBUG:
-            pygame.draw.line(self.screen, Colours.BLACK, self.front, self.back, 3)
-
-    def update(self, dt):
+    def steer(self, dt: float):
         # Get state of all keys
         keys = pygame.key.get_pressed()
+        # Provides steering functionality to the vehicle.a
+        if (keys[pygame.K_a]) and self.vel > 0:
+            self.angle -= STEER * dt
+        if (keys[pygame.K_d]) and self.vel > 0:
+            self.angle += STEER * dt
 
+    def drive(self, dt: float):
+        # Get state of all keys
+        keys = pygame.key.get_pressed()
         # If the W key is pressed accelerate
         if keys[pygame.K_w]:
             # Sets the acceleration to the constant when the player is driving
-            self.acc = self.ACC
+            self.acc = ACC
         else:
             # Sets the acceleration to 0 if nothing is being pressed
             self.acc = 0
             # Start decreasing the vehicles' velocity due to friction.
-            self.vel -= self.BRAKE * dt
+            self.vel -= BRAKE * dt
             # Cap the velocity so that breaking only stops the vehicle.
             if self.vel < 0:
                 self.vel = 0
-
         # If the space key is pressed the car brakes.
         if keys[pygame.K_SPACE]:
             # Brake the vehicle using the brake constant.
-            self.vel -= self.BRAKE * dt
+            self.vel -= BRAKE * dt
             # Cap the velocity so that breaking only stops the vehicle.
             if self.vel < 0:
                 self.vel = 0
 
-        # Provides steering functionality to the vehicle.a
-        if keys[pygame.K_a] and self.vel > 0:
-            self.a -= self.STEER * dt
-        if keys[pygame.K_d] and self.vel > 0:
-            self.a += self.STEER * dt
+    def scoring(self):
+        # Get the first element of the goals array.
+        goal: Goal.Goal = self.goals[0]
 
-        # Calculate the change in distance based on the velocity
-        delta = self.vel * dt + 0.5 * self.acc * (dt ** 2)
+        # Check if the cars hit box intersects the goal and update the score. Then add the goal to then end of the list.
+        if intersect(self.start, self.end, goal.start, goal.end):
+            self.score += 10
+            self.goals.append(self.goals.pop(0))
 
-        # Calculate the final velocity value
+    def update(self, dt: float):
+        # Check for acceleration and braking.
+        self.drive(dt)
+
+        # Check for steering.
+        self.steer(dt)
+
+        # Calculate the final velocity value base on the acceleration.
         self.vel = self.vel + self.acc * dt
 
-        # Cap the vehicles forward velocity
-        if self.vel > 0 and self.vel > self.VEL_LIM:
-            self.vel = self.VEL_LIM
+        # Cap the car's forward velocity
+        self.vel = MAX if self.vel > MAX else self.vel
 
-        # Update coordinates based on delta
-        self.x += delta * math.cos(math.radians(self.a))
-        self.y += delta * math.sin(math.radians(self.a))
+        # Calculate the change in distance based on the velocity.
+        delta = self.vel * dt + 0.5 * self.acc * (dt ** 2)
 
-        # Cap the vehicles' x coordinate to the width of the screen
-        if self.x > 800:
-            self.x = 0
-        elif self.x < 0:
-            self.x = 800
+        # Update the car's position based on its change in distance.
+        x = self.pos[0] + delta * math.cos(math.radians(self.angle))
+        y = self.pos[1] + delta * math.sin(math.radians(self.angle))
+        self.pos = (x, y)
 
-        # Cap the vehicles' y coordinate to the width of the screen
-        if self.y > 600:
-            self.y = 0
-        elif self.y < 0:
-            self.y = 600
+        # Update the car's hit box based on the new position.
+        self.start = (self.pos[0] + 25 * math.cos(math.radians(self.angle)),
+                      self.pos[1] + 25 * math.sin(math.radians(self.angle)))
+        self.end = (self.pos[0] - 25 * math.cos(math.radians(self.angle)),
+                    self.pos[1] - 25 * math.sin(math.radians(self.angle)))
 
-        # Calculates the car's new collision points
-        self.front = (self.x + 25 * math.cos(math.radians(self.a)), self.y + 25 * math.sin(math.radians(self.a)))
-        self.back = (self.x - 25 * math.cos(math.radians(self.a)), self.y - 25 * math.sin(math.radians(self.a)))
+        # Calculate the score.
+        self.scoring()
 
-        # Check for intersections with barriers.
-        self.intersectBarrier()
 
-        # Check for intersections with goals.
-        self.intersectGoal()
+def intersect(A: tuple, B: tuple, C: tuple, D: tuple):
+    # Helper function defined as a lambda within the intersect method
+    def check(X, Y, Z):
+        return (Z[1] - X[1]) * (Y[0] - X[0]) > (Y[1] - X[1]) * (Z[0] - X[0])
 
-        self.score += 0.001 * delta
-
-        # Draw the vehicles changes to the screen
-        self.draw()
+    # Check if the two line segments intersect each other.
+    return True if check(A, C, D) != check(B, C, D) and check(A, B, C) != check(A, B, D) else False
