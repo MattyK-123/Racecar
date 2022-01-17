@@ -11,15 +11,13 @@ class Goal:
         self.start = start
         self.end = end
 
-        # Property that tells the car if the goal is the next active goal.
-        self.active = False
+        # Calculate the goals center point.
+        self.center = ((self.start[0] + self.end[0]) / 2, (self.start[1] + self.end[1]) / 2)
 
     def draw(self, surface: pygame.Surface):
         # Draws the barrier to the screen if debug mode is enabled.
-        if Goal.DEBUG and self.active:
-            pygame.draw.line(surface, Colours.GREEN, self.start, self.end, 3)
-        elif Goal.DEBUG and not self.active:
-            pygame.draw.line(surface, Colours.RED, self.start, self.end, 3)
+        if Goal.DEBUG:
+            pygame.draw.line(surface, Colours.GREEN, self.start, self.end, 1)
 
 
 # Returns an array of goal objects created from the provided text file.

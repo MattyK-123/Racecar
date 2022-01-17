@@ -31,12 +31,16 @@ dt = clock.tick(100) * 10 ** (-3)
 # Variable used to store the game state.
 STATE = "INIT"
 
+# Variables that enables debugging visuals on all classes.
+Racecar.Racecar.DEBUG = False
+Goal.Goal.DEBUG = False
+
 
 def main():
     global STATE, dt, screen
 
     # Define an array to store a list of goal nodes.
-    goals= []
+    goals = []
 
     # Define a car variable.
     car = None
@@ -60,7 +64,7 @@ def main():
 
         elif STATE == "PLAY":
             # Update the car's position based on inputs.
-            car.update(dt)
+            car.update(screen, dt)
 
             # Draw the car to the screen.
             car.draw(screen)
@@ -73,13 +77,21 @@ def main():
             pygame.quit()
             exit()
 
-        # Transition the state to the QUIT state if the close button is clicked
+        # Check the even log for certain events.
         for event in pygame.event.get():
+            # Transition the state to the QUIT state if the close button is clicked.
             if event.type == pygame.QUIT:
                 STATE = "QUIT"
 
+            # Check if the keys 1 or 2 where pressed to enable the various debug displays.
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_1:
+                    Racecar.Racecar.DEBUG = not Racecar.Racecar.DEBUG
+                elif event.key == pygame.K_2:
+                    Goal.Goal.DEBUG = not Goal.Goal.DEBUG
+
         # Draw various statistics to the screen
-        Text.draw(screen, "FPS: " + str(round(clock.get_fps(), 5)), (105, 5))
+        Text.draw(screen, "FPS: " + str(round(clock.get_fps(), 4)), (105, 5))
         Text.draw(screen, "STATE: " + STATE, (5, 5))
         Text.draw(screen, "SCORE: " + str(round(car.score, 5)), (205, 5))
 
