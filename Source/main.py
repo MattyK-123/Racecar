@@ -1,3 +1,4 @@
+import neat
 import pygame
 
 import Goal
@@ -42,8 +43,11 @@ def main():
     # Define an array to store a list of goal nodes.
     goals = []
 
+    # Populate the goal list with objects generated from "Goals.txt".
+    goals = Goal.loadGoals("../Data/Goals.txt")
+
     # Define a car variable.
-    car = None
+    car = Racecar.Racecar(goals)
 
     while True:
         # Caps the frame-rate to 100 and returns the change in time in seconds.
@@ -52,36 +56,19 @@ def main():
         # Draw the background surface at the origin
         screen.blit(background, (0, 0))
 
-        # Defines the start of the state machine and its various states.
-        if STATE == "INIT":
-            # Populate the goal list with objects generated from "Goals.txt".
-            goals = Goal.loadGoals("../Data/Goals.txt")
+        # Update the car's position based on inputs.
+        x = car.update(screen, dt)
 
-            # Change state to the play state.
-            STATE = "PLAY"
-
-            car = Racecar.Racecar(goals)
-
-        elif STATE == "PLAY":
-            # Update the car's position based on inputs.
-            car.update(screen, dt)
-
-            # Draw the car to the screen.
-            car.draw(screen)
-
-            # Draw the goal nodes to the screen.
-            for goal in goals:
-                goal.draw(screen)
-
-        elif STATE == "QUIT":
-            pygame.quit()
-            exit()
+        # Draw the goal nodes to the screen.
+        for goal in goals:
+            goal.draw(screen)
 
         # Check the even log for certain events.
         for event in pygame.event.get():
             # Transition the state to the QUIT state if the close button is clicked.
             if event.type == pygame.QUIT:
-                STATE = "QUIT"
+                pygame.quit()
+                exit()
 
             # Check if the keys 1 or 2 where pressed to enable the various debug displays.
             elif event.type == pygame.KEYUP:
@@ -93,11 +80,25 @@ def main():
         # Draw various statistics to the screen
         Text.draw(screen, "FPS: " + str(round(clock.get_fps(), 4)), (105, 5))
         Text.draw(screen, "STATE: " + STATE, (5, 5))
-        Text.draw(screen, "SCORE: " + str(round(car.score, 5)), (205, 5))
 
         # Update screen
         pygame.display.update()
 
 
 if __name__ == "__main__":
+    # Load configuration for NEAT-Python.
+    config = neat.Config(neat.DefaultGenome,
+                         neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet,
+                         neat.DefaultStagnation,
+                         "../Data/Config.txt")
+
+    # Create the population, which is the top-level object for a NEAT run.
+    population = neat.Population(config)
+
+    # Add a stdout reporter to show progress in the terminal.
+    population.add_reporter(neat.StdOutReporter(True))
+    population.add_reporter(neat.StatisticsReporter())
+    population.add_reporter(neat.Checkpointer(5))
+
     main()

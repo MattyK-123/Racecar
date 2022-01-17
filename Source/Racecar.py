@@ -1,26 +1,26 @@
 import math
 
-import numpy as np
 import pygame
 
 import Colours
 import Goal
 
-# Constants for car physics.
-ACC = 500
-DEC = -500
-BRAKE = 400
-FRICTION = 100
-STEER = 200
-MAX = 500
-
 
 class Racecar:
     DEBUG = False
 
+    # Constants for car physics.
+    ACC = 500
+    DEC = -500
+    BRAKE = 400
+    FRICTION = 100
+    STEER = 200
+    MAX = 500
+
     def __init__(self, goals: list):
         # Define a variable to track this instance's score.
         self.score = 0
+        self.dead = False
 
         # Create a copy of the goal list order.
         self.goals = goals.copy()
@@ -60,10 +60,10 @@ class Racecar:
         # Get state of all keys
         keys = pygame.key.get_pressed()
         # Provides steering functionality to the vehicle.a
-        if (keys[pygame.K_a]) and self.vel > 0:
-            self.angle -= STEER * dt
-        if (keys[pygame.K_d]) and self.vel > 0:
-            self.angle += STEER * dt
+        if keys[pygame.K_a] and self.vel > 0:
+            self.angle -= Racecar.STEER * dt
+        if keys[pygame.K_d] and self.vel > 0:
+            self.angle += Racecar.STEER * dt
 
     def drive(self, dt: float):
         # Get state of all keys
@@ -71,16 +71,16 @@ class Racecar:
         # If the W key is pressed accelerate
         if keys[pygame.K_w]:
             # Sets the acceleration to the constant when the player is driving
-            self.acc = ACC
+            self.acc = Racecar.ACC
         else:
             # Sets the acceleration to 0 if nothing is being pressed
             self.acc = 0
             # Start decreasing the vehicles' velocity due to friction.
-            self.vel -= BRAKE * dt
+            self.vel -= Racecar.BRAKE * dt
         # If the space key is pressed then the car brakes.
         if keys[pygame.K_SPACE]:
             # Brake the vehicle using the brake constant.
-            self.vel -= BRAKE * dt
+            self.vel -= Racecar.BRAKE * dt
         # Cap the velocity so that breaking only stops the vehicle.
         if self.vel < 0:
             self.vel = 0
@@ -91,7 +91,7 @@ class Racecar:
 
         # Check if the cars hit box intersects the goal and update the score. Then add the goal to then end of the list.
         if intersect(self.start, self.end, goal.start, goal.end):
-            self.score += 10
+            self.score += 1
             self.goals.append(self.goals.pop(0))
 
     def goalcast(self, screen: pygame.Surface):
@@ -154,6 +154,9 @@ class Racecar:
         return distances
 
     def reset(self):
+        # Mark the car as dead.
+        self.dead = True
+
         # Reset the car's position.
         self.pos = (240, 210)
         self.angle = 38
@@ -183,7 +186,7 @@ class Racecar:
         self.vel = self.vel + self.acc * dt
 
         # Cap the car's forward velocity
-        self.vel = MAX if self.vel > MAX else self.vel
+        self.vel = Racecar.MAX if self.vel > Racecar.MAX else self.vel
 
         # Calculate the change in distance based on the velocity.
         delta = self.vel * dt + 0.5 * self.acc * (dt ** 2)
@@ -206,9 +209,16 @@ class Racecar:
         if self.out(screen):
             self.reset()
 
-        q = self.raycast(screen)
+        # Return an array of the distances to the walls.
+        walls = self.raycast(screen)
 
-        z = self.goalcast(screen)
+        # Returns the coordinates of the vehicle and the next goal.
+        coords = self.goalcast(screen)
+
+        # Draw the car to the screen.
+        self.draw(screen)
+
+        return walls + coords
 
 
 def intersect(A: tuple, B: tuple, C: tuple, D: tuple):
